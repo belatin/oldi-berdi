@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="uz" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <title>Profil | Oldi-Berdi</title>
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --p: #d1007a; --bg: #f8f9fa; --gray: #8e8e93; --text-dark: #1c1c1e; --border-light: #f0f0f2; --card-white: #ffffff; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); }
+        .navbar {
+            background: rgba(255,255,255,0.82); backdrop-filter: blur(16px);
+            padding: 10px 8%; display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 20px; position: sticky; top: 0; z-index: 1000;
+        }
+        .logo { font-size: 26px; font-weight: 800; background: linear-gradient(135deg, var(--p), #7b1fa2); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+        .nav-icons { display: flex; gap: 18px; }
+        .nav-icon { text-decoration: none; color: var(--text-dark); display: flex; flex-direction: column; align-items: center; font-size: 13px; gap: 4px; }
+        .nav-icon i { font-size: 22px; }
+        .container { max-width: 900px; margin: 32px auto; padding: 0 24px; }
+        .card { background: var(--card-white); border-radius: 28px; border: 1px solid var(--border-light); padding: 28px; margin-bottom: 28px; }
+        .card-title { font-size: 20px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .info-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-light); }
+        .info-label { font-weight: 500; color: var(--gray); }
+        .info-value { font-weight: 500; }
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-weight: 500; margin-bottom: 8px; font-size: 14px; }
+        .input-style { width: 100%; padding: 14px; border-radius: 20px; border: 2px solid var(--border-light); background: #fbfbfd; font-size: 16px; transition: 0.2s; outline: none; }
+        .input-style:focus { border-color: var(--p); background: white; }
+        .btn { padding: 12px 24px; border-radius: 40px; font-weight: 600; border: none; cursor: pointer; transition: 0.2s; }
+        .btn-primary { background: var(--p); color: white; }
+        .btn-primary:hover { background: #b8006c; }
+        .btn-outline { background: transparent; border: 2px solid var(--border-light); }
+        .btn-outline:hover { border-color: var(--p); color: var(--p); }
+        .stats-grid { display: flex; gap: 20px; margin-top: 20px; }
+        .stat-card { background: var(--bg); border-radius: 24px; padding: 20px; flex: 1; text-align: center; border: 1px solid var(--border-light); }
+        .stat-number { font-size: 32px; font-weight: 800; color: var(--p); }
+        .stat-label { font-size: 14px; color: var(--gray); margin-top: 8px; }
+        .alert { padding: 12px 20px; border-radius: 24px; margin-bottom: 20px; display: none; }
+        .alert-success { background: #d1fae5; color: #065f46; border-left: 4px solid #10b981; }
+        .alert-error { background: #fee2e2; color: #991b1b; border-left: 4px solid #ef4444; }
+        .flex { display: flex; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+        .footer { text-align: center; padding: 24px; border-top: 1px solid var(--border-light); margin-top: 40px; color: var(--gray); }
+
+        /* Toggle switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 52px;
+            height: 28px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.3s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: var(--p);
+        }
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .setting-info {
+            flex: 1;
+        }
+        .setting-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .setting-desc {
+            font-size: 13px;
+            color: var(--gray);
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar">
+    <a href="/ads" class="logo">Oldi<span>-Berdi</span></a>
+    <div class="nav-icons">
+        <a href="/ads/create" class="nav-icon"><i class="bi bi-plus-circle"></i><span>Sotish</span></a>
+        <a href="/favorites" class="nav-icon"><i class="bi bi-heart"></i><span>Sevimlilar</span></a>
+        <a href="/profile" class="nav-icon"><i class="bi bi-person-circle"></i><span>Profil</span></a>
+    </div>
+</nav>
+
+<div class="container">
+    <!-- Xabarlar -->
+    <div id="message" class="alert"></div>
+
+    <!-- 1. Shaxsiy ma'lumotlar -->
+    <div class="card">
+        <div class="card-title"><i class="bi bi-person"></i> Shaxsiy ma'lumotlar</div>
+        <div class="info-row">
+            <span class="info-label">Telefon raqam</span>
+            <span class="info-value" th:text="${user.phone}"></span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Foydalanuvchi nomi</span>
+            <span class="info-value" id="usernameValue" th:text="${user.username}"></span>
+            <button class="btn btn-outline-sm" id="editUsernameBtn" style="padding:6px 16px; border-radius:30px;"><i class="bi bi-pencil"></i> O‘zgartirish</button>
+        </div>
+        <div id="editUsernameForm" style="display: none; margin-top: 16px;">
+            <div class="form-group">
+                <input type="text" id="newUsername" class="input-style" placeholder="Yangi username">
+            </div>
+            <div class="flex">
+                <button class="btn btn-primary" id="saveUsernameBtn">Saqlash</button>
+                <button class="btn btn-outline" id="cancelUsernameBtn">Bekor qilish</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Xavfsizlik (Parolni o'zgartirish) -->
+    <div class="card">
+        <div class="card-title"><i class="bi bi-shield-lock"></i> Parolni o‘zgartirish</div>
+        <form id="changePasswordForm">
+            <div class="form-group">
+                <label class="form-label">Eski parol</label>
+                <input type="password" id="oldPassword" class="input-style" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Yangi parol</label>
+                <input type="password" id="newPassword" class="input-style" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Yangi parolni takrorlang</label>
+                <input type="password" id="confirmPassword" class="input-style" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Parolni yangilash</button>
+        </form>
+    </div>
+
+    <!-- 3. Statistika va linklar -->
+    <div class="card">
+        <div class="card-title"><i class="bi bi-graph-up"></i> Faoliyat</div>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" th:text="${adsCount}">0</div>
+                <div class="stat-label">Mening e'lonlarim</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" th:text="${favoritesCount}">0</div>
+                <div class="stat-label">Sevimlilar</div>
+            </div>
+        </div>
+        <div class="flex" style="margin-top: 24px;">
+            <a href="/my-ads" class="btn btn-outline"><i class="bi bi-list-ul"></i> Mening e'lonlarim</a>
+            <a href="/favorites" class="btn btn-outline"><i class="bi bi-heart"></i> Sevimlilarga o‘tish</a>
+        </div>
+    </div>
+    <!-- Siz bilan bog'lanish usuli -->
+    <div class="card">
+        <div class="card-title"><i class="bi bi-chat-dots"></i> Siz bilan bog'lanishning afzal usuli</div>
+        <div class="contact-settings">
+            <div class="setting-item">
+                <div class="setting-info">
+                    <div class="setting-name">Qo'ng'iroq orqali</div>
+                    <div class="setting-desc">Sizga telefon orqali qo'ng'iroq qilishlari mumkin</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="allowPhoneCall">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            <div class="setting-item">
+                <div class="setting-info">
+                    <div class="setting-name">Telegramda suhbat</div>
+                    <div class="setting-desc">Telegram orqali xabar yozishlari mumkin</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="allowTelegram">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+        </div>
+        <div class="flex" style="margin-top: 24px;">
+            <button id="saveContactSettings" class="btn btn-primary">Saqlash</button>
+        </div>
+    </div>
+</div>
+
+<div class="footer">© 2025 Oldi-Berdi – Ishonchli savdo maydoni</div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content') || 'X-CSRF-TOKEN';
+
+    function showMessage(msg, type) {
+        const msgDiv = document.getElementById('message');
+        msgDiv.textContent = msg;
+        msgDiv.className = `alert alert-${type}`;
+        msgDiv.style.display = 'block';
+        setTimeout(() => { msgDiv.style.display = 'none'; }, 5000);
+    }
+
+    // ----- Username tahrirlash -----
+    const editBtn = document.getElementById('editUsernameBtn');
+    const usernameSpan = document.getElementById('usernameValue');
+    const editForm = document.getElementById('editUsernameForm');
+    const newUsernameInput = document.getElementById('newUsername');
+    const saveUsernameBtn = document.getElementById('saveUsernameBtn');
+    const cancelUsernameBtn = document.getElementById('cancelUsernameBtn');
+
+    editBtn.addEventListener('click', () => {
+        newUsernameInput.value = usernameSpan.innerText;
+        editForm.style.display = 'block';
+        editBtn.style.display = 'none';
+    });
+    cancelUsernameBtn.addEventListener('click', () => {
+        editForm.style.display = 'none';
+        editBtn.style.display = 'inline-block';
+    });
+    saveUsernameBtn.addEventListener('click', async () => {
+        const newName = newUsernameInput.value.trim();
+        if (!newName) return showMessage("Username bo‘sh bo‘lishi mumkin emas", "error");
+        try {
+            const res = await fetch('/api/users/username', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', [csrfHeader]: csrfToken },
+                body: JSON.stringify({ username: newName })
+            });
+            if (res.ok) {
+                usernameSpan.innerText = newName;
+                showMessage("Username muvaffaqiyatli o‘zgartirildi", "success");
+                editForm.style.display = 'none';
+                editBtn.style.display = 'inline-block';
+            } else {
+                const err = await res.text();
+                showMessage("Xatolik: " + err, "error");
+            }
+        } catch (e) { showMessage("Server bilan bog‘lanishda xato", "error"); }
+    });
+
+    // ----- Parolni o‘zgartirish -----
+    const passForm = document.getElementById('changePasswordForm');
+    passForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const oldPass = document.getElementById('oldPassword').value;
+        const newPass = document.getElementById('newPassword').value;
+        const confirmPass = document.getElementById('confirmPassword').value;
+        if (newPass !== confirmPass) return showMessage("Yangi parollar mos kelmadi", "error");
+        try {
+            const res = await fetch('/api/users/password', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', [csrfHeader]: csrfToken },
+                body: JSON.stringify({ oldPassword: oldPass, newPassword: newPass })
+            });
+            if (res.ok) {
+                showMessage("Parol muvaffaqiyatli o‘zgartirildi", "success");
+                passForm.reset();
+            } else {
+                const err = await res.text();
+                showMessage("Xatolik: " + err, "error");
+            }
+        } catch (e) { showMessage("Server bilan bog‘lanishda xato", "error"); }
+    });
+
+    // ----- Contact Settings yuklash va saqlash -----
+    async function loadContactSettings() {
+        try {
+            const response = await fetch('/api/users/contact-settings');
+            if (response.ok) {
+                const settings = await response.json();
+                document.getElementById('allowPhoneCall').checked = settings.allowPhoneCall;
+                document.getElementById('allowTelegram').checked = settings.allowTelegram;
+            } else {
+                console.error('Failed to load contact settings');
+            }
+        } catch (error) {
+            console.error('Error loading contact settings:', error);
+        }
+    }
+
+    const saveContactBtn = document.getElementById('saveContactSettings');
+    if (saveContactBtn) {
+        // Remove existing listeners by cloning
+        const newSaveBtn = saveContactBtn.cloneNode(true);
+        saveContactBtn.parentNode.replaceChild(newSaveBtn, saveContactBtn);
+
+        newSaveBtn.addEventListener('click', async () => {
+            console.log("Save button clicked");
+            const settings = {
+                allowPhoneCall: document.getElementById('allowPhoneCall').checked,
+                allowTelegram: document.getElementById('allowTelegram').checked
+            };
+            const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+            try {
+                const res = await fetch('/api/users/contact-settings', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+                    body: JSON.stringify(settings)
+                });
+                if (res.ok) {
+                    showMessage("Sozlamalar saqlandi", "success");
+                } else {
+                    showMessage("Xatolik: " + res.status, "error");
+                }
+            } catch(e) {
+                console.error(e);
+                showMessage("Server bilan bog‘lanishda xato", "error");
+            }
+        });
+    }
+
+    // Sahifa yuklanganda
+    document.addEventListener('DOMContentLoaded', function() {
+        loadContactSettings();
+    });
+    /*]]>*/
+</script>
+</body>
+</html>

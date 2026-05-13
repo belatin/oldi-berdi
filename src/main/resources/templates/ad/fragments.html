@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="ad-list">
+  <th:block th:each="ad : ${ads.content}">
+    <a th:href="@{/ads/{id}(id=${ad.id})}" class="ad-card">
+      <img class="card-img" th:src="${ad.imageUrl != null ? '/uploads/' + ad.imageUrl : 'https://placehold.co/600x400/f5f5f7/8e8e93?text=Rasm+yo‘q'}" alt="Rasm">
+      <div class="card-content">
+        <h3 class="card-title" th:text="${ad.title}">Nomi</h3>
+        <div class="price" th:text="${#numbers.formatDecimal(ad.price, 0, 'COMMA', 0, 'POINT')} + ' soʻm'">0 so'm</div>
+        <div class="card-meta">
+          <span><i class="bi bi-tag"></i> <span th:text="${ad.categoryName}">Kategoriya</span></span>
+          <span><i class="bi bi-geo-alt"></i> <span th:text="${ad.locationName}">Manzil</span></span>
+          <span><i class="bi bi-calendar3"></i> <span th:text="${ad.createdAt}">Sana</span></span>
+        </div>
+        <div class="seller">
+          <div class="seller-avatar-small" th:text="${#strings.substring(ad.username,0,1)}">U</div>
+          <span th:text="${ad.username}">Sotuvchi</span>
+        </div>
+      </div>
+    </a>
+  </th:block>
+  <div th:if="${ads.empty}" class="no-results" style="grid-column: 1/-1; text-align: center; padding: 60px; color: var(--gray);">
+    <i class="bi bi-emoji-frown" style="font-size: 48px;"></i>
+    <p style="margin-top: 12px;">Hozircha hech qanday e'lon topilmadi</p>
+  </div>
+</th:block>
+</html>

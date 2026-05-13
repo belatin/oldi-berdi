@@ -1,0 +1,9 @@
+CREATE TABLE images(
+    id BIGSERIAL PRIMARY KEY ,
+    url VARCHAR NOT NULL ,
+    is_main BOOLEAN NOT NULL DEFAULT FALSE,
+    ad_id BIGINT NOT NULL REFERENCES ads(id),
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL,
+    deleted BOOLEAN NOT NULL DEFAULT false
+)

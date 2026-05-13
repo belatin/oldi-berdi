@@ -1,0 +1,21 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <include file="db/changelog/v1/001-create-users-table.sql"/>
+    <include file="db/changelog/v1/002-create-locations-table.sql"/>
+    <include file="db/changelog/v1/003-create-categories-table.sql"/>
+    <include file="db/changelog/v1/004-create-ads-table.sql"/>
+    <include file="db/changelog/v1/005-create-images-table.sql"/>
+    <include file="db/changelog/v1/006-insert-categories.sql"/>
+    <include file="db/changelog/v1/007-partial-unique-indexes.sql"/>
+    <include file="db/changelog/v1/008-alter-locations-name-length.sql"/>
+    <include file="db/changelog/v1/009-create-attribute-tables.sql"/>
+    <include file="db/changelog/v1/010-insert-mobile-attributes.sql"/>
+    <include file="db/changelog/v1/011-delete-column-login_type-and-rename-login-to-phone-with-users-table.sql"/>
+    <include file="db/changelog/v1/012-delete-constrint-notnull-username-with-users.sql"/>
+    <include file="db/changelog/v1/014-create-favorites-table.sql"/>
+    <include file="db/changelog/v1/015-add-columns-users-table.sql"/>
+</databaseChangeLog>

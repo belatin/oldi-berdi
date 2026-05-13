@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <title>E'lon yaratish | Oldi-Berdi</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <style>
+    :root { --p: #d1007a; --s: #7b1fa2; --bg: #f8f9fa; --gray: #8e8e93; }
+    body { background: var(--bg); font-family: 'Inter', sans-serif; margin: 0; color: #1d1d1f; }
+    .navbar { background: rgba(255,255,255,0.8); backdrop-filter: blur(15px); padding: 12px 8%; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid rgba(0,0,0,0.05); }
+    .logo { font-size: 26px; font-weight: 800; background: linear-gradient(45deg, var(--p), var(--s)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+    .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+    .form-card { background: white; border-radius: 30px; padding: 40px; box-shadow: 0 10px 40px rgba(0,0,0,0.03); }
+
+    /* Upload images (same as before) */
+    .upload-section { margin-bottom: 40px; }
+    .preview-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
+    .preview-item { position: relative; width: 140px; height: 140px; border-radius: 20px; background: #fbfbfd; border: 2px solid #f2f2f7; transition: 0.3s; cursor: grab; overflow: visible; }
+    .preview-item.drag-over { border: 2px dashed var(--p); transform: scale(1.05); }
+    .preview-item img { width: 100%; height: 100%; object-fit: cover; border-radius: 18px; }
+    .btn-img-ctrl { position: absolute; width: 28px; height: 28px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    .btn-delete { top: -8px; right: -8px; background: #ff3b30; color: white; }
+    .btn-make-main { top: -8px; left: -8px; background: white; color: var(--gray); }
+    .main-badge { position: absolute; top: -8px; left: -8px; background: var(--p); color: white; padding: 4px 10px; border-radius: 10px; font-size: 10px; font-weight: 800; text-transform: uppercase; z-index: 11; border: 2px solid white; }
+    .upload-placeholder { width: 140px; height: 140px; border: 2px dashed #d2d2d7; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; color: var(--gray); transition: 0.3s; }
+    .upload-placeholder:hover { border-color: var(--p); background: #fdf2f8; color: var(--p); }
+
+    /* Form inputs */
+    .form-group { margin-bottom: 25px; }
+    .form-group label { display: block; font-weight: 600; margin-bottom: 10px; font-size: 14px; }
+    .input-style { width: 100%; padding: 15px; border-radius: 16px; border: 2px solid #f2f2f7; background: #fbfbfd; font-size: 16px; transition: 0.3s; box-sizing: border-box; }
+    .input-style:focus { border-color: var(--p); outline: none; background: white; }
+    .btn-submit { background: var(--p); color: white; border: none; width: 100%; padding: 18px; border-radius: 20px; font-size: 18px; font-weight: 700; cursor: pointer; margin-top: 20px; }
+
+    /* Custom dropdown (category & location) */
+    .dropdown-container { position: relative; }
+    .dropdown-trigger { background: #fbfbfd; border: 2px solid #f2f2f7; border-radius: 16px; padding: 15px; font-size: 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; }
+    .dropdown-trigger:hover { border-color: var(--p-light); }
+    .dropdown-panel { position: absolute; background: white; border-radius: 20px; box-shadow: 0 20px 35px rgba(0,0,0,0.15); width: 100%; max-height: 400px; overflow-y: auto; z-index: 1000; margin-top: 8px; border: 1px solid #eee; top: 100%; left: 0; }
+    .hidden-dropdown { display: none; }
+    .category-item, .location-item { padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border-bottom: 1px solid #f0f0f0; transition: 0.1s; }
+    .category-item:hover, .location-item:hover { background: #fdf2f8; }
+    .item-name { font-weight: 500; }
+    .item-arrow { color: var(--gray); font-size: 18px; }
+    .breadcrumb-bar { padding: 10px 15px; background: #fafafa; border-bottom: 1px solid #eee; display: flex; flex-wrap: wrap; gap: 6px; font-size: 13px; }
+    .breadcrumb-back { cursor: pointer; color: var(--p); font-weight: 500; }
+    .breadcrumb-back:hover { text-decoration: underline; }
+    .selected-value { color: var(--p); font-weight: 500; }
+  </style>
+</head>
+<body>
+<nav class="navbar">
+  <a href="/ads" class="logo">Oldi<span>-Berdi</span></a>
+</nav>
+
+<div class="container">
+  <div class="form-card">
+    <h1>Yangi e'lon yaratish</h1>
+    <form id="adForm" th:action="@{/ads/create}" method="post" enctype="multipart/form-data">
+
+      <!-- Rasmlar -->
+      <div class="upload-section">
+        <label style="display: block; font-weight: 600; margin-bottom: 15px;">Rasmlar</label>
+        <div class="preview-list" id="previewList">
+          <label class="upload-placeholder" id="uploadBtn">
+            <input type="file" id="fileInput" name="images" accept="image/*" multiple style="display: none;">
+            <i class="bi bi-camera-fill" style="font-size: 24px;"></i>
+            <span style="font-size: 12px; margin-top: 5px;">Rasm qo'shish</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Sarlavha -->
+      <div class="form-group">
+        <label>E'lon sarlavhasi</label>
+        <input type="text" name="title" class="input-style" placeholder="Masalan: iPhone 12 Pro" required>
+      </div>
+
+      <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+        <!-- Kategoriya picker -->
+        <div class="form-group" style="flex: 1;">
+          <label>Kategoriya</label>
+          <div class="dropdown-container" id="categoryDropdownContainer">
+            <div class="dropdown-trigger" id="categoryTrigger">
+              <span id="selectedCategoryName">Kategoriya tanlang</span>
+              <i class="bi bi-chevron-down"></i>
+            </div>
+            <div id="categoryDropdown" class="dropdown-panel hidden-dropdown">
+              <div class="breadcrumb-bar" id="categoryBreadcrumb"></div>
+              <div id="categoriesList"></div>
+            </div>
+          </div>
+          <input type="hidden" id="selectedCategoryId" name="categoryId" required>
+        </div>
+
+        <!-- Hudud picker -->
+        <div class="form-group" style="flex: 1;">
+          <label>Hudud</label>
+          <div class="dropdown-container" id="locationDropdownContainer">
+            <div class="dropdown-trigger" id="locationTrigger">
+              <span id="selectedLocationName">Hudud tanlang</span>
+              <i class="bi bi-chevron-down"></i>
+            </div>
+            <div id="locationDropdown" class="dropdown-panel hidden-dropdown">
+              <div class="breadcrumb-bar" id="locationBreadcrumb"></div>
+              <div id="locationsList"></div>
+            </div>
+          </div>
+          <input type="hidden" id="selectedLocationId" name="locationId" required>
+        </div>
+      </div>
+
+      <!-- Dinamik atributlar -->
+      <div id="attributesContainer"></div>
+
+      <!-- Narx va tavsif -->
+      <div class="form-group">
+        <label>Narxi (so'm)</label>
+        <input type="number" name="price" class="input-style" placeholder="0" required>
+      </div>
+      <div class="form-group">
+        <label>Tavsif</label>
+        <textarea name="description" class="input-style" style="height: 120px;" placeholder="Mahsulot haqida batafsil..."></textarea>
+      </div>
+
+      <input type="hidden" name="mainImageIndex" value="0">
+      <button type="submit" class="btn-submit">E'lonni saqlash</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  // ==================== RASMLAR (original code) ====================
+  let selectedFiles = [];
+
+  document.getElementById('fileInput').addEventListener('change', function(e) {
+    const newFiles = Array.from(e.target.files);
+    selectedFiles = [...selectedFiles, ...newFiles];
+    renderPreviews();
+    this.value = '';
+  });
+
+  async function renderPreviews() {
+    const previewList = document.getElementById('previewList');
+    const uploadBtn = document.getElementById('uploadBtn');
+    previewList.innerHTML = '';
+    for (let index = 0; index < selectedFiles.length; index++) {
+      const file = selectedFiles[index];
+      const imageData = await readFileAsDataURL(file);
+      const wrapper = document.createElement('div');
+      wrapper.className = 'preview-item';
+      wrapper.setAttribute('draggable', index !== 0);
+      wrapper.dataset.index = index;
+      if (index !== 0) {
+        wrapper.addEventListener('dragstart', handleDragStart);
+        wrapper.addEventListener('dragover', handleDragOver);
+        wrapper.addEventListener('dragleave', handleDragLeave);
+        wrapper.addEventListener('drop', handleDrop);
+        wrapper.addEventListener('dragend', handleDragEnd);
+      }
+      const isMain = index === 0;
+      const badgeOrBtn = isMain ? '<span class="main-badge">Asosiy</span>' : `<button type="button" onclick="makeMain(${index})" class="btn-img-ctrl btn-make-main" title="Asosiy qilish"><i class="bi bi-star"></i></button>`;
+      wrapper.innerHTML = `${badgeOrBtn}<img src="${imageData}"><button type="button" onclick="removeImage(${index})" class="btn-img-ctrl btn-delete">&times;</button>`;
+      previewList.appendChild(wrapper);
+    }
+    previewList.appendChild(uploadBtn);
+  }
+
+  function readFileAsDataURL(file) {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => resolve(e.target.result);
+      reader.readAsDataURL(file);
+    });
+  }
+  function makeMain(index) { const element = selectedFiles.splice(index, 1)[0]; selectedFiles.unshift(element); renderPreviews(); }
+  function removeImage(index) { selectedFiles.splice(index, 1); renderPreviews(); }
+  let draggedItemIndex = null;
+  function handleDragStart(e) { draggedItemIndex = parseInt(this.dataset.index); e.dataTransfer.effectAllowed = 'move'; this.style.opacity = '0.4'; }
+  function handleDragOver(e) { e.preventDefault(); const targetIndex = parseInt(this.dataset.index); if (targetIndex !== 0) this.classList.add('drag-over'); }
+  function handleDragLeave() { this.classList.remove('drag-over'); }
+  function handleDrop(e) { e.preventDefault(); this.classList.remove('drag-over'); const targetIndex = parseInt(this.dataset.index); if (targetIndex === 0 || draggedItemIndex === null) return; if (draggedItemIndex !== targetIndex) { const itemToMove = selectedFiles.splice(draggedItemIndex, 1)[0]; selectedFiles.splice(targetIndex, 0, itemToMove); renderPreviews(); } }
+  function handleDragEnd() { this.style.opacity = '1'; draggedItemIndex = null; }
+
+  document.getElementById('adForm').addEventListener('submit', function(e) {
+    if (selectedFiles.length === 0) { alert("Kamida bitta rasm yuklang!"); e.preventDefault(); return; }
+    if (!document.getElementById('selectedCategoryId').value) { alert("Kategoriyani tanlang!"); e.preventDefault(); return; }
+    if (!document.getElementById('selectedLocationId').value) { alert("Hududni tanlang!"); e.preventDefault(); return; }
+    const dataTransfer = new DataTransfer();
+    selectedFiles.forEach(file => dataTransfer.items.add(file));
+    document.getElementById('fileInput').files = dataTransfer.files;
+  });
+
+  // ==================== KATEGORIYA PICKER (hierarchical) ====================
+  let categoryStack = [];
+  const catTrigger = document.getElementById('categoryTrigger');
+  const catDropdown = document.getElementById('categoryDropdown');
+  const catListDiv = document.getElementById('categoriesList');
+  const catBreadcrumbDiv = document.getElementById('categoryBreadcrumb');
+  const catIdInput = document.getElementById('selectedCategoryId');
+  const catNameSpan = document.getElementById('selectedCategoryName');
+
+  catTrigger.addEventListener('click', (e) => { e.stopPropagation(); catDropdown.classList.toggle('hidden-dropdown'); if (!catDropdown.classList.contains('hidden-dropdown')) loadRootCategories(); });
+  document.addEventListener('click', function(e) { if (!catDropdown.contains(e.target) && !catTrigger.contains(e.target)) catDropdown.classList.add('hidden-dropdown'); });
+  function loadRootCategories() { fetch('/ads/categories/root').then(res=>res.json()).then(cats=>{ categoryStack=[]; renderCategoryBreadcrumb(); renderCategoryList(cats); }).catch(console.error); }
+  function loadChildCategories(parentId) { fetch(`/ads/categories/children?parentId=${parentId}`).then(res=>res.json()).then(cats=>renderCategoryList(cats)).catch(console.error); }
+  function renderCategoryList(categories) {
+    catListDiv.innerHTML = '';
+    if (categories.length === 0) { catListDiv.innerHTML = '<div style="padding:20px;text-align:center;color:#999;">Hech qanday kategoriya yo‘q</div>'; return; }
+    categories.forEach(cat => {
+      const div = document.createElement('div'); div.className = 'category-item';
+      div.innerHTML = `<span class="item-name">${escapeHtml(cat.name)}</span>${cat.hasChildren ? '<span class="item-arrow">›</span>' : ''}`;
+      div.addEventListener('click', (e) => { e.stopPropagation();
+        if (cat.hasChildren) { categoryStack.push({ id: cat.id, name: cat.name }); renderCategoryBreadcrumb(); loadChildCategories(cat.id); }
+        else { selectCategory(cat.id, cat.name); catDropdown.classList.add('hidden-dropdown'); }
+      });
+      catListDiv.appendChild(div);
+    });
+  }
+  function renderCategoryBreadcrumb() {
+    catBreadcrumbDiv.innerHTML = '';
+    const rootSpan = document.createElement('span'); rootSpan.className = 'breadcrumb-back'; rootSpan.textContent = 'Barcha kategoriyalar';
+    rootSpan.onclick = () => { categoryStack = []; renderCategoryBreadcrumb(); loadRootCategories(); };
+    catBreadcrumbDiv.appendChild(rootSpan);
+    categoryStack.forEach((cat, idx) => {
+      const sep = document.createElement('span'); sep.textContent = ' / '; catBreadcrumbDiv.appendChild(sep);
+      const catSpan = document.createElement('span'); catSpan.className = 'breadcrumb-back'; catSpan.textContent = cat.name;
+      catSpan.onclick = () => { categoryStack = categoryStack.slice(0, idx+1); renderCategoryBreadcrumb(); const last = categoryStack[categoryStack.length-1]; if(last) loadChildCategories(last.id); else loadRootCategories(); };
+      catBreadcrumbDiv.appendChild(catSpan);
+    });
+  }
+  function selectCategory(id, name) { catIdInput.value = id; catNameSpan.textContent = name; catNameSpan.classList.add('selected-value'); fetchAttributes(id); }
+  function fetchAttributes(categoryId) { fetch(`/ads/attributes?categoryId=${categoryId}`).then(res=>res.json()).then(attrs=>renderAttributes(attrs)); }
+  function renderAttributes(attributes) {
+    const container = document.getElementById('attributesContainer');
+    container.innerHTML = '';
+    if (attributes.length === 0) return;
+    const title = document.createElement('h3'); title.textContent = 'Xususiyatlar'; title.style.cssText = 'font-size:16px; font-weight:600; margin-bottom:15px;'; container.appendChild(title);
+    attributes.forEach(attr => {
+      const group = document.createElement('div'); group.className = 'form-group';
+      const label = document.createElement('label'); label.textContent = attr.name + (attr.required ? ' *' : ''); group.appendChild(label);
+      let input;
+      if (attr.attributeType === 'SELECT') {
+        input = document.createElement('select'); input.className = 'input-style'; input.name = `attributeValues[${attr.id}]`;
+        if (!attr.required) { const empty = document.createElement('option'); empty.value = ''; empty.textContent = 'Tanlang'; input.appendChild(empty); }
+        attr.options.forEach(opt => { const option = document.createElement('option'); option.value = opt; option.textContent = opt; input.appendChild(option); });
+      } else if (attr.attributeType === 'NUMBER') { input = document.createElement('input'); input.type = 'number'; input.className = 'input-style'; input.name = `attributeValues[${attr.id}]`; }
+      else { input = document.createElement('input'); input.type = 'text'; input.className = 'input-style'; input.name = `attributeValues[${attr.id}]`; }
+      if (attr.required) input.required = true;
+      group.appendChild(input); container.appendChild(group);
+    });
+  }
+
+  // ==================== HUDUD PICKER (hierarchical) ====================
+  let locationStack = [];
+  const locTrigger = document.getElementById('locationTrigger');
+  const locDropdown = document.getElementById('locationDropdown');
+  const locListDiv = document.getElementById('locationsList');
+  const locBreadcrumbDiv = document.getElementById('locationBreadcrumb');
+  const locIdInput = document.getElementById('selectedLocationId');
+  const locNameSpan = document.getElementById('selectedLocationName');
+
+  locTrigger.addEventListener('click', (e) => { e.stopPropagation(); locDropdown.classList.toggle('hidden-dropdown'); if (!locDropdown.classList.contains('hidden-dropdown')) loadRootLocations(); });
+  document.addEventListener('click', function(e) { if (!locDropdown.contains(e.target) && !locTrigger.contains(e.target)) locDropdown.classList.add('hidden-dropdown'); });
+  function loadRootLocations() { fetch('/ads/locations/root').then(res=>res.json()).then(locs=>{ locationStack=[]; renderLocationBreadcrumb(); renderLocationList(locs); }).catch(console.error); }
+  function loadChildLocations(parentId) { fetch(`/ads/locations/children?parentId=${parentId}`).then(res=>res.json()).then(locs=>renderLocationList(locs)).catch(console.error); }
+  function renderLocationList(locations) {
+    locListDiv.innerHTML = '';
+    if (locations.length === 0) { locListDiv.innerHTML = '<div style="padding:20px;text-align:center;color:#999;">Hech qanday hudud yo‘q</div>'; return; }
+    locations.forEach(loc => {
+      const div = document.createElement('div'); div.className = 'location-item';
+      div.innerHTML = `<span class="item-name">${escapeHtml(loc.name)}</span>${loc.hasChildren ? '<span class="item-arrow">›</span>' : ''}`;
+      div.addEventListener('click', (e) => { e.stopPropagation();
+        if (loc.hasChildren) { locationStack.push({ id: loc.id, name: loc.name }); renderLocationBreadcrumb(); loadChildLocations(loc.id); }
+        else { selectLocation(loc.id, loc.name); locDropdown.classList.add('hidden-dropdown'); }
+      });
+      locListDiv.appendChild(div);
+    });
+  }
+  function renderLocationBreadcrumb() {
+    locBreadcrumbDiv.innerHTML = '';
+    const rootSpan = document.createElement('span'); rootSpan.className = 'breadcrumb-back'; rootSpan.textContent = 'Barcha hududlar';
+    rootSpan.onclick = () => { locationStack = []; renderLocationBreadcrumb(); loadRootLocations(); };
+    locBreadcrumbDiv.appendChild(rootSpan);
+    locationStack.forEach((loc, idx) => {
+      const sep = document.createElement('span'); sep.textContent = ' / '; locBreadcrumbDiv.appendChild(sep);
+      const locSpan = document.createElement('span'); locSpan.className = 'breadcrumb-back'; locSpan.textContent = loc.name;
+      locSpan.onclick = () => { locationStack = locationStack.slice(0, idx+1); renderLocationBreadcrumb(); const last = locationStack[locationStack.length-1]; if(last) loadChildLocations(last.id); else loadRootLocations(); };
+      locBreadcrumbDiv.appendChild(locSpan);
+    });
+  }
+  function selectLocation(id, name) { locIdInput.value = id; locNameSpan.textContent = name; locNameSpan.classList.add('selected-value'); }
+
+  function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+
+  // Initial load for root categories (dropdown closed by default)
+</script>
+</body>
+</html>

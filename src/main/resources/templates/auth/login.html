@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="uz" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Kirish | Oldi-Berdi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    :root {
+      --p: #d1007a;
+      --p-light: #ff8dc7;
+      --p-soft: #fdf2f8;
+      --s: #7b1fa2;
+      --bg: #f8f9fa;
+      --gray: #8e8e93;
+      --text-dark: #1c1c1e;
+      --text-muted: #6c6c70;
+      --border-light: #f0f0f2;
+      --card-white: #ffffff;
+      --shadow-md: 0 12px 30px rgba(0, 0, 0, 0.05);
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(145deg, #f5f5f7 0%, #fefafc 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .auth-card {
+      max-width: 480px;
+      width: 100%;
+      background: var(--card-white);
+      border-radius: 32px;
+      padding: 40px;
+      box-shadow: var(--shadow-md);
+      transition: transform 0.2s;
+      border: 1px solid var(--border-light);
+    }
+    .brand {
+      font-size: 28px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--p), var(--s));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 28px;
+      text-align: center;
+    }
+    h5 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 24px;
+      color: var(--text-dark);
+      text-align: center;
+    }
+    .form-group {
+      margin-bottom: 24px;
+    }
+    .form-label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: var(--text-dark);
+    }
+    .input-style {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 20px;
+      border: 2px solid var(--border-light);
+      background: #fbfbfd;
+      font-size: 16px;
+      font-family: 'Inter', sans-serif;
+      transition: 0.2s;
+      outline: none;
+    }
+    .input-style:focus {
+      border-color: var(--p);
+      background: white;
+    }
+    .btn-submit {
+      background: var(--p);
+      color: white;
+      border: none;
+      width: 100%;
+      padding: 14px;
+      border-radius: 28px;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.2s;
+      margin-top: 8px;
+    }
+    .btn-submit:hover {
+      background: #b8006c;
+      transform: translateY(-2px);
+    }
+    .alert-danger {
+      background: #ffe5e5;
+      border-left: 4px solid #ff3b30;
+      padding: 12px 16px;
+      border-radius: 16px;
+      margin-bottom: 24px;
+      color: #b91c1c;
+      font-size: 14px;
+    }
+    .footer-links {
+      text-align: center;
+      margin-top: 28px;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+    .footer-links a {
+      color: var(--p);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .footer-links a:hover {
+      text-decoration: underline;
+    }
+    .error-message {
+      color: #ff3b30;
+      font-size: 13px;
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .phone-hint {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+<div class="auth-card">
+  <div class="brand">Oldi<span style="-webkit-text-fill-color: var(--p);">-Berdi</span></div>
+  <h5>Hisobingizga kiring</h5>
+
+  <!-- Xatolikni ko‘rsatish (Spring Security login error) -->
+  <div th:if="${param.error}" class="alert-danger">
+    <i class="bi bi-exclamation-triangle-fill"></i> Telefon raqam yoki parol noto‘g‘ri
+  </div>
+
+  <!-- Agar oldingi autentifikatsiya talab qilingan bo‘lsa -->
+  <div th:if="${param.require}" class="alert-danger">
+    <i class="bi bi-shield-lock-fill"></i> Iltimos, avval tizimga kiring
+  </div>
+
+  <form th:action="@{/auth/login}" method="post" id="loginForm">
+    <!-- Telefon raqam -->
+    <div class="form-group">
+      <label class="form-label">Telefon raqam</label>
+      <input type="tel"
+             id="phoneInput"
+             name="phone"
+             class="input-style"
+             placeholder="+998 __ ___ __ __"
+             autocomplete="off"
+             required>
+      <div id="phoneError" class="error-message" style="display: none;">
+        <i class="bi bi-exclamation-triangle-fill"></i> <span></span>
+      </div>
+      <div class="phone-hint">Masalan: +998 90 123 45 67</div>
+    </div>
+
+    <!-- Parol -->
+    <div class="form-group">
+      <label class="form-label">Parol</label>
+      <input type="password"
+             name="password"
+             class="input-style"
+             placeholder="Parolingizni kiriting"
+             required>
+    </div>
+
+    <button type="submit" class="btn-submit">Kirish</button>
+  </form>
+
+  <div class="footer-links">
+    Akkauntingiz yo‘qmi? <a th:href="@{/auth/registration}">Ro‘yxatdan o‘tish</a>
+  </div>
+</div>
+
+<script>
+  const phoneInput = document.getElementById('phoneInput');
+  const phoneErrorDiv = document.getElementById('phoneError');
+  const phoneErrorSpan = phoneErrorDiv.querySelector('span');
+
+  // Telefon raqamni formatlash (xuddi registration sahifasidagidek)
+  phoneInput.addEventListener('input', function(e) {
+    let value = this.value;
+    // Faqat raqamlar va + belgisini saqlaymiz
+    let cleaned = value.replace(/[^\d+]/g, '');
+    // Agar +998 boshida bo'lmasa, qo'shamiz
+    if (!cleaned.startsWith('+998')) {
+      if (cleaned.startsWith('998')) {
+        cleaned = '+' + cleaned;
+      } else if (cleaned.startsWith('+')) {
+        if (!cleaned.startsWith('+998')) {
+          cleaned = '+998';
+        }
+      } else {
+        cleaned = '+998' + cleaned;
+      }
+    }
+    // Faqat raqamlarni olish (belgisiz)
+    let digits = cleaned.replace(/\D/g, '');
+    // +998 dan keyingi 9 ta raqamni olish
+    if (digits.length > 12) digits = digits.slice(0, 12);
+    // Format: +998 XX XXX XX XX
+    let formatted = '+998 ';
+    if (digits.length > 3) {
+      formatted += digits.slice(3, 5) + ' ';
+    }
+    if (digits.length > 5) {
+      formatted += digits.slice(5, 8) + ' ';
+    }
+    if (digits.length > 8) {
+      formatted += digits.slice(8, 10) + ' ';
+    }
+    if (digits.length > 10) {
+      formatted += digits.slice(10, 12);
+    }
+    this.value = formatted.trim();
+
+    // Validatsiya: to'liq 9 raqam bo'lishi kerak (+998 dan keyin)
+    const digitsOnly = this.value.replace(/\D/g, '');
+    const isValid = digitsOnly.length === 12 && digitsOnly.startsWith('998');
+    if (this.value.length > 0 && !isValid) {
+      phoneErrorSpan.textContent = 'Telefon raqam to‘liq emas. Namunaviy format: +998 90 123 45 67';
+      phoneErrorDiv.style.display = 'flex';
+    } else {
+      phoneErrorDiv.style.display = 'none';
+    }
+  });
+
+  // Formani jo‘natishda validatsiya
+  document.getElementById('loginForm').addEventListener('submit', function(e) {
+    const digits = phoneInput.value.replace(/\D/g, '');
+    const isValid = digits.length === 12 && digits.startsWith('998');
+    if (!isValid) {
+      e.preventDefault();
+      phoneErrorSpan.textContent = 'Iltimos, to‘liq telefon raqamni kiriting (+998 XX XXX XX XX)';
+      phoneErrorDiv.style.display = 'flex';
+      phoneInput.focus();
+    } else {
+      // Formani jo‘natishdan oldin probellarni olib tashlash (backendda ham tozalash mumkin)
+      phoneInput.value = phoneInput.value.replace(/\s/g, '');
+    }
+  });
+</script>
+</body>
+</html>

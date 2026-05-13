@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="uz"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <title>Barcha e'lonlar | Oldi-Berdi</title>
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --p: #d1007a;
+            --bg: #f8f9fa;
+            --gray: #8e8e93;
+            --text-dark: #1c1c1e;
+            --border-light: #f0f0f2;
+            --card-white: #ffffff;
+        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); }
+        .navbar {
+            background: rgba(255,255,255,0.82);
+            backdrop-filter: blur(16px);
+            padding: 10px 8%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .logo { font-size: 26px; font-weight: 800; background: linear-gradient(135deg, var(--p), #7b1fa2); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+        .search-wrapper { flex: 1; max-width: 480px; }
+        .search-form { display: flex; background: rgba(0,0,0,0.03); border-radius: 40px; padding: 6px 16px; border: 1px solid rgba(0,0,0,0.04); }
+        .search-form input { flex: 1; background: transparent; border: none; padding: 10px 0; outline: none; }
+        .search-form button { background: none; border: none; cursor: pointer; }
+        .nav-icons { display: flex; gap: 18px; }
+        .nav-icon { text-decoration: none; color: var(--text-dark); display: flex; flex-direction: column; align-items: center; font-size: 13px; gap: 4px; }
+        .nav-icon i { font-size: 22px; }
+        .container { max-width: 1280px; margin: 32px auto; padding: 0 24px; }
+        .breadcrumbs { margin-bottom: 28px; font-size: 14px; color: var(--gray); }
+        .page-header { display: flex; justify-content: space-between; margin-bottom: 32px; }
+        .ads-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 20px; }
+        .ad-card {
+            background: var(--card-white);
+            border-radius: 24px;
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+            position: relative;
+            transition: 0.2s;
+        }
+        .ad-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.05); }
+        .card-img { width: 100%; height: 180px; object-fit: cover; }
+        .card-content { padding: 14px 12px 16px; }
+        .card-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+        .price { font-size: 18px; font-weight: 800; color: var(--p); margin-bottom: 6px; }
+        .card-meta { font-size: 11px; color: var(--gray); display: flex; gap: 8px; flex-wrap: wrap; }
+        .favorite-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: transparent;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 10;
+            padding: 0;
+            color: #ff3b30;
+        }
+        .favorite-btn i { pointer-events: none; }
+        .load-more-container { text-align: center; margin: 20px 0 40px; }
+        .btn-load-more { background: transparent; border: 2px solid var(--p); color: var(--p); padding: 12px 32px; border-radius: 40px; font-weight: 700; cursor: pointer; }
+        .footer { text-align: center; padding: 24px; border-top: 1px solid var(--border-light); margin-top: 40px; color: var(--gray); }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="/ads" class="logo">Oldi<span>-Berdi</span></a>
+    <div class="search-wrapper">
+        <form class="search-form" action="/ads/search" method="get">
+            <input type="text" name="q" placeholder="Qidiruv...">
+            <button type="submit"><i class="bi bi-search"></i></button>
+        </form>
+    </div>
+    <div class="nav-icons">
+        <a href="/ads/create" class="nav-icon"><i class="bi bi-plus-circle"></i><span>Sotish</span></a>
+        <a href="/favorites" class="nav-icon"><i class="bi bi-heart"></i><span>Sevimlilar</span></a>
+        <div sec:authorize="isAnonymous()"><a href="/login" class="nav-icon"><i class="bi bi-person"></i><span>Kirish</span></a></div>
+        <div th:href="@{/profile}" sec:authorize="isAuthenticated()"><a href="/profile" class="nav-icon"><i class="bi bi-person-circle"></i><span>Profil</span></a></div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="breadcrumbs"><a href="/ads">Bosh sahifa</a> / <span>Barcha e'lonlar</span></div>
+    <div class="page-header">
+        <h1>Hamma e'lonlar</h1>
+        <div class="result-count" th:text="${ads.totalElements} + ' ta natija'">0 ta natija</div>
+    </div>
+    <div id="adsContainer" class="ads-grid">
+        <th:block th:each="ad : ${ads.content}">
+            <div class="ad-card">
+                <button type="button" class="favorite-btn" th:attr="data-id=${ad.id}">
+                    <i class="bi bi-heart"></i>
+                </button>
+                <a th:href="@{/ads/{id}(id=${ad.id})}" style="text-decoration: none; color: inherit;">
+                    <img class="card-img" th:src="${ad.imageUrl != null ? '/uploads/' + ad.imageUrl : 'https://placehold.co/600x400/f5f5f7/8e8e93?text=Rasm+yo‘q'}" alt="Rasm">
+                    <div class="card-content">
+                        <h3 class="card-title" th:text="${ad.title}">Nomi</h3>
+                        <div class="price" th:text="${#numbers.formatDecimal(ad.price, 0, 'COMMA', 0, 'POINT')} + ' soʻm'">0 so'm</div>
+                        <div class="card-meta">
+                            <span><i class="bi bi-tag"></i> <span th:text="${ad.categoryName}">Kategoriya</span></span>
+                            <span><i class="bi bi-geo-alt"></i> <span th:text="${ad.locationName}">Manzil</span></span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </th:block>
+        <div th:if="${ads.empty}" style="grid-column:1/-1; text-align:center; padding:60px;">Hech qanday e'lon yo‘q</div>
+    </div>
+    <div id="loadMoreContainer" class="load-more-container" th:unless="${ads.totalPages le 1}">
+        <button id="loadMoreBtn" class="btn-load-more"><i class="bi bi-arrow-repeat"></i> Yana ko'rsatish</button>
+    </div>
+</div>
+<div class="footer">© 2025 Oldi-Berdi – Ishonchli savdo maydoni</div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    // CSRF token
+    const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content') || 'X-CSRF-TOKEN';
+
+    let isLoggedIn = false;
+    /*[# sec:authorize="isAuthenticated()"]*/ isLoggedIn = true; /*[/]*/
+
+    let favoriteSet = new Set();
+
+    // ------ Yuklash ------
+    function loadFavorites() {
+        if (isLoggedIn) {
+            fetch('/api/ads/my')
+                .then(res => res.ok ? res.json() : [])
+                .then(ads => {
+                    favoriteSet = new Set(ads.map(a => a.id));
+                    updateAllIcons();
+                })
+                .catch(() => loadLocal());
+        } else {
+            loadLocal();
+        }
+    }
+
+    function loadLocal() {
+        try {
+            const stored = localStorage.getItem('favorites');
+            favoriteSet = stored ? new Set(JSON.parse(stored)) : new Set();
+        } catch(e) { favoriteSet = new Set(); }
+        updateAllIcons();
+    }
+
+    function updateAllIcons() {
+        document.querySelectorAll('.favorite-btn').forEach(btn => {
+            const id = parseInt(btn.dataset.id);
+            const icon = btn.querySelector('i');
+            if (favoriteSet.has(id)) {
+                icon.className = 'bi bi-heart-fill';
+            } else {
+                icon.className = 'bi bi-heart';
+            }
+        });
+    }
+
+    // ------ Toggle funksiyasi ------
+    async function toggleFavorite(btn) {
+        const adId = parseInt(btn.dataset.id);
+        const wasFav = favoriteSet.has(adId);
+        const icon = btn.querySelector('i');
+
+        if (isLoggedIn) {
+            try {
+                const res = await fetch(`/favorites/toggle/${adId}`, {
+                    method: 'POST',
+                    headers: { [csrfHeader]: csrfToken }
+                });
+                if (res.ok) {
+                    if (wasFav) {
+                        favoriteSet.delete(adId);
+                        icon.className = 'bi bi-heart';
+                    } else {
+                        favoriteSet.add(adId);
+                        icon.className = 'bi bi-heart-fill';
+                    }
+                } else {
+                    console.error('Server xatosi:', res.status);
+                }
+            } catch(err) { console.error(err); }
+        } else {
+            let local = [];
+            try { local = JSON.parse(localStorage.getItem('favorites') || '[]'); } catch(e) {}
+            if (wasFav) {
+                local = local.filter(id => id !== adId);
+                favoriteSet.delete(adId);
+                icon.className = 'bi bi-heart';
+            } else {
+                local.push(adId);
+                favoriteSet.add(adId);
+                icon.className = 'bi bi-heart-fill';
+            }
+            localStorage.setItem('favorites', JSON.stringify(local));
+        }
+    }
+
+    // ------ Event listeners (delegatsiya orqali) ------
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('.favorite-btn');
+        if (btn) {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleFavorite(btn);
+        }
+    });
+
+    // ------ Pagination ------
+    const totalPages = /*[[${ads.totalPages}]]*/ 1;
+    let currentPage = 0;
+    let loading = false;
+    const loadBtn = document.getElementById('loadMoreBtn');
+    const container = document.getElementById('adsContainer');
+    if (loadBtn) {
+        loadBtn.addEventListener('click', () => {
+            if (loading) return;
+            const next = currentPage + 1;
+            if (next >= totalPages) {
+                loadBtn.style.display = 'none';
+                return;
+            }
+            loading = true;
+            const originalHtml = loadBtn.innerHTML;
+            loadBtn.innerHTML = '⏳ Yuklanmoqda...';
+            loadBtn.disabled = true;
+            fetch(`/ads?page=${next}&size=30`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(res => res.text())
+                .then(html => {
+                    container.insertAdjacentHTML('beforeend', html);
+                    currentPage = next;
+                    if (currentPage + 1 >= totalPages) loadBtn.style.display = 'none';
+                    loadBtn.innerHTML = originalHtml;
+                    loadBtn.disabled = false;
+                    loading = false;
+                    updateAllIcons(); // yangi kartochkalar uchun iconlarni tuzat
+                })
+                .catch(() => {
+                    loadBtn.innerHTML = originalHtml;
+                    loadBtn.disabled = false;
+                    loading = false;
+                });
+        });
+    }
+
+    window.addEventListener('DOMContentLoaded', loadFavorites);
+    /*]]>*/
+</script>
+</body>
+</html>

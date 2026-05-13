@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>E'lon tafsilotlari | Oldi-Berdi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --p: #d1007a;
+            --p-light: #ff8dc7;
+            --p-soft: #fdf2f8;
+            --s: #7b1fa2;
+            --bg: #f8f9fa;
+            --gray: #8e8e93;
+            --text-dark: #1c1c1e;
+            --text-muted: #6c6c70;
+            --border-light: #f0f0f2;
+            --card-white: #ffffff;
+            --shadow-sm: 0 8px 20px rgba(0, 0, 0, 0.02), 0 2px 6px rgba(0, 0, 0, 0.03);
+            --shadow-md: 0 12px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-dark);
+            line-height: 1.5;
+        }
+
+        /* ========= НОВЫЙ NAVBAR с иконками ========= */
+        .navbar {
+            background: rgba(255, 255, 255, 0.82);
+            backdrop-filter: blur(16px);
+            padding: 10px 8%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+            flex-wrap: wrap;
+        }
+        .logo {
+            font-size: 26px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--p), var(--s));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+            letter-spacing: -0.3px;
+            white-space: nowrap;
+        }
+        .logo span {
+            background: none;
+            -webkit-text-fill-color: var(--p);
+        }
+        /* Search bar */
+        .search-wrapper {
+            flex: 1;
+            max-width: 480px;
+            min-width: 180px;
+        }
+        .search-form {
+            display: flex;
+            align-items: center;
+            background: rgba(0,0,0,0.03);
+            border-radius: 40px;
+            padding: 6px 16px;
+            border: 1px solid rgba(0,0,0,0.04);
+            transition: 0.2s;
+        }
+        .search-form:focus-within {
+            background: white;
+            border-color: var(--p-light);
+            box-shadow: 0 0 0 2px rgba(209,0,122,0.1);
+        }
+        .search-form input {
+            background: transparent;
+            border: none;
+            padding: 10px 0;
+            font-size: 15px;
+            width: 100%;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+        }
+        .search-form button {
+            background: transparent;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+            font-size: 18px;
+            padding: 0 4px;
+            transition: color 0.2s;
+        }
+        .search-form button:hover {
+            color: var(--p);
+        }
+        /* Nav icons */
+        .nav-icons {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+        .nav-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-dark);
+            font-size: 13px;
+            font-weight: 500;
+            transition: color 0.2s;
+            gap: 4px;
+        }
+        .nav-icon i {
+            font-size: 22px;
+        }
+        .nav-icon span {
+            font-size: 12px;
+        }
+        .nav-icon:hover {
+            color: var(--p);
+        }
+        @media (max-width: 680px) {
+            .navbar {
+                padding: 10px 16px;
+            }
+            .nav-icon span {
+                display: none;
+            }
+            .nav-icon i {
+                font-size: 24px;
+            }
+            .search-wrapper {
+                order: 3;
+                width: 100%;
+                max-width: 100%;
+                margin-top: 6px;
+            }
+        }
+
+        /* ===== Остальные стили (галерея, карточка и т.д.) полностью сохранены ===== */
+        .container {
+            max-width: 1280px;
+            margin: 32px auto;
+            padding: 0 24px;
+        }
+        .detail-card {
+            background: var(--card-white);
+            border-radius: 32px;
+            padding: 32px 36px;
+            box-shadow: var(--shadow-md);
+        }
+        .breadcrumbs-modern {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 28px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        .breadcrumbs-modern a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .breadcrumbs-modern a:hover {
+            color: var(--p);
+        }
+        .breadcrumbs-modern i {
+            font-size: 12px;
+            color: #c6c6c8;
+        }
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 48px;
+            align-items: start;
+        }
+        .gallery-modern {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .main-image-frame {
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            background: #fbfbfd;
+            border-radius: 28px;
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-sm);
+        }
+        .main-image-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .thumbnail-strip {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 14px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+        .thumb-modern {
+            width: 84px;
+            height: 84px;
+            border-radius: 20px;
+            object-fit: cover;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+            background: #f5f5f7;
+        }
+        .thumb-modern:hover {
+            transform: scale(0.98);
+            border-color: var(--p-light);
+        }
+        .thumb-modern.active {
+            border-color: var(--p);
+            box-shadow: 0 6px 12px rgba(209, 0, 122, 0.12);
+        }
+        .info-panel {
+            position: sticky;
+            top: 24px;
+        }
+        .ad-title-modern {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            margin-bottom: 12px;
+        }
+        .price-modern {
+            font-size: 34px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--p), #b00068);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 28px;
+            display: inline-block;
+        }
+        .seller-card-modern {
+            background: #fefafc;
+            border-radius: 28px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-light);
+        }
+        .seller-header-modern {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .seller-avatar-modern {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(145deg, #ffe6f2, #ffd9ec);
+            color: var(--p);
+            border-radius: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 24px;
+            text-transform: uppercase;
+        }
+        .seller-name-modern {
+            font-weight: 700;
+            font-size: 18px;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            border-radius: 24px;
+            font-weight: 600;
+            font-size: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+            border: none;
+            font-family: 'Inter', sans-serif;
+        }
+        .btn-primary-modern {
+            background: var(--p);
+            color: white;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(209, 0, 122, 0.2);
+        }
+        .btn-primary-modern:hover {
+            background: #b8006c;
+            transform: translateY(-1px);
+        }
+        .btn-outline-modern {
+            background: transparent;
+            border: 1.5px solid var(--border-light);
+            color: var(--text-dark);
+        }
+        .btn-outline-modern:hover {
+            background: #f9f9fb;
+            border-color: var(--p);
+        }
+        .meta-details {
+            margin-top: 16px;
+            font-size: 14px;
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .meta-details i {
+            width: 22px;
+            color: var(--p);
+        }
+        /* Блок характеристик (вы его сами перенесли под фото — эти стили не мешают) */
+        .attributes-modern {
+            background: #fefafc;
+            border-radius: 28px;
+            padding: 20px 24px;
+            margin: 20px 0 24px 0;
+            border: 1px solid var(--border-light);
+        }
+        .attributes-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-dark);
+        }
+        .attributes-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .attribute-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            border-bottom: 1px dashed #e9e9ef;
+            padding-bottom: 8px;
+        }
+        .attr-name {
+            font-weight: 500;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        .attr-value {
+            font-weight: 600;
+            color: var(--text-dark);
+            text-align: right;
+            word-break: break-word;
+            max-width: 60%;
+        }
+        .bottom-detail-section {
+            grid-column: 1 / -1;
+            margin-top: 48px;
+            padding-top: 32px;
+            border-top: 2px solid var(--border-light);
+        }
+        .section-title-modern {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            letter-spacing: -0.2px;
+        }
+        .description-text-modern {
+            color: #3a3a3e;
+            line-height: 1.6;
+            background: #fefafc;
+            padding: 20px 24px;
+            border-radius: 24px;
+            margin-bottom: 40px;
+            border: 1px solid var(--border-light);
+            white-space: pre-wrap;
+        }
+        .map-placeholder-modern {
+            width: 100%;
+            height: 280px;
+            background: #f2f2f5;
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px dashed #cbcbd0;
+            color: var(--gray);
+            flex-direction: column;
+            gap: 12px;
+        }
+        .map-placeholder-modern i {
+            font-size: 40px;
+            opacity: 0.5;
+        }
+        @media (max-width: 880px) {
+            .detail-grid {
+                grid-template-columns: 1fr;
+                gap: 32px;
+            }
+            .info-panel {
+                position: static;
+            }
+            .detail-card {
+                padding: 24px;
+            }
+        }
+        @media (max-width: 560px) {
+            .thumb-modern {
+                width: 68px;
+                height: 68px;
+            }
+            .ad-title-modern {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ========= НОВЫЙ NAVBAR С ИКОНКАМИ, ПОИСКОМ ========= -->
+<nav class="navbar">
+    <a href="/ads" class="logo">Oldi<span>-Berdi</span></a>
+
+    <div class="search-wrapper">
+        <form class="search-form" action="/ads/search" method="get">
+            <input type="text" name="q" placeholder="Qidiruv..." aria-label="Search">
+            <button type="submit"><i class="bi bi-search"></i></button>
+        </form>
+    </div>
+
+    <div class="nav-icons">
+        <a href="/favorites" class="nav-icon">
+            <i class="bi bi-heart"></i>
+            <span>Sevimlilar</span>
+        </a>
+        <!-- Анонимный пользователь видит "Kirish", авторизованный можно заменить на профиль -->
+        <a href="/login" class="nav-icon" th:if="${#authorization.expression('isAnonymous()')}">
+            <i class="bi bi-person"></i>
+            <span>Kirish</span>
+        </a>
+        <a href="/profile" class="nav-icon" th:unless="${#authorization.expression('isAnonymous()')}">
+            <i class="bi bi-person-circle"></i>
+            <span>Profil</span>
+        </a>
+    </div>
+</nav>
+
+<!-- ОСНОВНОЙ КОНТЕНТ СТРАНИЦЫ (без изменений) -->
+<div class="container">
+    <div class="detail-card">
+        <div class="breadcrumbs-modern">
+            <a href="/ads"><i class="bi bi-house-door-fill"></i> Bosh sahifa</a>
+            <i class="bi bi-chevron-right"></i>
+            <a th:href="@{/ads}" th:text="${ad.categoryName != null ? ad.categoryName : 'Kategoriya'}">Kategoriya</a>
+            <i class="bi bi-chevron-right"></i>
+            <span th:text="${ad.title}">E'lon nomi</span>
+        </div>
+
+        <div class="detail-grid">
+            <!-- Левая колонка: галерея (характеристики вы перенесли ниже сами, но я оставил блок attributes-modern для совместимости)
+                 Вы можете разместить блок характеристик где угодно, он не нарушит вёрстку -->
+            <div class="gallery-modern">
+                <div class="main-image-frame">
+                    <img id="mainImage"
+                         th:src="${ad.imagesUrls != null and !#lists.isEmpty(ad.imagesUrls)} ? '/uploads/' + ${ad.imagesUrls[0]} : 'https://placehold.co/800x600/f5f5f7/8e8e93?text=Rasm+yo‘q'"
+                         alt="Asosiy rasm">
+                </div>
+                <div class="thumbnail-strip">
+                    <th:block th:each="url, iterStat : ${ad.imagesUrls}">
+                        <img class="thumb-modern" th:classappend="${iterStat.first} ? 'active'"
+                             th:src="'/uploads/' + ${url}"
+                             onclick="changeImage(this)" alt="thumbnail">
+                    </th:block>
+                    <th:block th:if="${ad.imagesUrls == null or #lists.isEmpty(ad.imagesUrls)}">
+                        <img class="thumb-modern active" src="https://placehold.co/84x84/f5f5f7/8e8e93?text=No+img"
+                             style="cursor:default;" alt="placeholder">
+                    </th:block>
+                </div>
+                <!-- Блок характеристик (вы его сами перенесли под фото, он здесь для примера)
+                     Если хотите, оставьте или переместите куда угодно, классы уже есть -->
+                <div th:unless="${ad.attributeCharacteristic == null or #maps.isEmpty(ad.attributeCharacteristic)}" class="attributes-modern">
+                    <h4 class="attributes-title"><i class="bi bi-tags-fill"></i> Xususiyatlar</h4>
+                    <div class="attributes-grid">
+                        <div th:each="entry : ${ad.attributeCharacteristic}" class="attribute-item">
+                            <span class="attr-name" th:text="${entry.key}"></span>
+                            <span class="attr-value" th:text="${entry.value}"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Правая колонка: продавец и информация -->
+            <div class="info-panel">
+                <h1 class="ad-title-modern" th:text="${ad.title}">Mahsulot nomi</h1>
+                <div class="price-modern">
+                    <span th:text="${#numbers.formatDecimal(ad.price, 0, 'COMMA', 0, 'POINT')} + ' soʻm'">0 so'm</span>
+                </div>
+
+                <div class="seller-card-modern">
+                    <div class="seller-header-modern">
+                        <div class="seller-avatar-modern">
+                            <span th:text="${#strings.substring(ad.username,0,1)}">?</span>
+                        </div>
+                        <div class="seller-name-modern" th:text="${ad.username != null ? ad.username : 'Nomaʼlum sotuvchi'}">
+                            Foydalanuvchi
+                        </div>
+                    </div>
+
+                    <!-- Qo'ng'iroq qilish tugmasi (faqat ruxsat berilgan bo'lsa) -->
+                    <div th:if="${ad.allowPhoneCall}">
+                        <a th:href="'tel:' + ${ad.sellerPhone}" class="btn btn-primary-modern" style="display: block; text-decoration: none; text-align: center;">
+                            <i class="bi bi-telephone-fill"></i> Qo'ng'iroq qilish
+                        </a>
+                    </div>
+
+                    <!-- Telegramda yozish tugmasi (faqat ruxsat berilgan bo'lsa) -->
+                    <div th:if="${ad.allowTelegram}">
+                        <a th:href="'https://t.me/' + ${ad.sellerPhone}" target="_blank" class="btn btn-outline-modern" style="display: block; text-decoration: none; text-align: center;">
+                            <i class="bi bi-telegram"></i> Telegramda yozish
+                        </a>
+                    </div>
+
+                    <!-- Agar ikkala tugma ham ruxsat berilmagan bo'lsa, xabar ko'rsatamiz -->
+                    <div th:unless="${ad.allowPhoneCall or ad.allowTelegram}" class="text-muted" style="text-align: center; padding: 12px;">
+                        <i class="bi bi-info-circle"></i> Sotuvchi hech qanday aloqa usulini faollashtirmagan
+                    </div>
+                </div>
+
+                <div class="meta-details">
+                    <div><i class="bi bi-calendar3"></i> Joylashtirilgan:
+                        <span th:text="${ad.createdAt != null ? ad.createdAt : 'Kun nomaʼlum'}"></span>
+                    </div>
+                    <div><i class="bi bi-geo-alt"></i> Manzil:
+                        <span th:text="${ad.locationName != null ? ad.locationName : 'Belgilanmagan'}"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Нижняя секция: описание и карта -->
+            <div class="bottom-detail-section">
+                <h3 class="section-title-modern"><i class="bi bi-info-circle-fill" style="color: var(--p);"></i> Batafsil ma'lumot</h3>
+                <div class="description-text-modern" th:utext="${ad.description != null ? ad.description : 'Tavsif mavjud emas.'}">
+                    Mahsulot haqida batafsil maʼlumot.
+                </div>
+
+                <h3 class="section-title-modern"><i class="bi bi-map-fill" style="color: var(--p);"></i> Xaritada manzil</h3>
+                <div class="map-placeholder-modern">
+                    <i class="bi bi-map"></i>
+                    <p>Google Maps / Leaflet integratsiyasi (tez orada)</p>
+                    <span style="font-size: 13px;" th:text="${ad.locationName != null ? ad.locationName : 'Manzil ko‘rsatilmagan'}"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function changeImage(thumbElement) {
+        if (!thumbElement || !thumbElement.src) return;
+        const mainImage = document.getElementById('mainImage');
+        if (mainImage) {
+            mainImage.src = thumbElement.src;
+        }
+        document.querySelectorAll('.thumb-modern').forEach(thumb => thumb.classList.remove('active'));
+        thumbElement.classList.add('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const contactBtn = document.getElementById('contactSellerBtn');
+        const msgBtn = document.getElementById('messageBtn');
+        if (contactBtn) {
+            contactBtn.addEventListener('click', () => alert("📞 Bog‘lanish funksiyasi hozircha ishlab chiqilmoqda."));
+        }
+        if (msgBtn) {
+            msgBtn.addEventListener('click', () => alert("✉️ Xabar yuborish tizimi tez orada ishga tushadi."));
+        }
+    });
+</script>
+</body>
+</html>
