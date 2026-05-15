@@ -19,4 +19,6 @@ public class LoginValidator {
         String digitsOnly = login.replaceAll(" ", "");
         return PHONE_PATTERN.matcher(digitsOnly).matches();
     }
+
+
 }

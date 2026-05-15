@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="uz">
+<html xmlns:th="http://www.thymeleaf.org" lang="uz"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 <head>
     <meta charset="UTF-8">
     <title>Sevimlilar | Oldi-Berdi</title>
@@ -56,10 +57,12 @@
     <a href="/ads" class="logo">Oldi<span>-Berdi</span></a>
     <div class="nav-icons">
         <a href="/ads/create" class="nav-icon"><i class="bi bi-plus-circle"></i><span>Sotish</span></a>
-        <a href="/favorites" class="nav-icon"><i class="bi bi-heart-fill" style="color: var(--p);"></i><span>Sevimlilar</span></a>
-        <div id="navAuth">
-            <a href="/login" class="nav-icon" id="loginLink"><i class="bi bi-person"></i><span>Kirish</span></a>
-            <a href="/profile" class="nav-icon" id="profileLink" style="display: none;"><i class="bi bi-person-circle"></i><span>Profil</span></a>
+        <a href="/favorites" class="nav-icon"><i class="bi bi-heart"></i><span>Sevimlilar</span></a>
+        <div sec:authorize="isAnonymous()">
+            <a href="/login" class="nav-icon"><i class="bi bi-person"></i><span>Kirish</span></a>
+        </div>
+        <div sec:authorize="isAuthenticated()">
+            <a href="/profile" class="nav-icon"><i class="bi bi-person-circle"></i><span>Profil</span></a>
         </div>
     </div>
 </nav>

@@ -9,37 +9,130 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         :root {
             --p: #d1007a;
+            --p-light: #ff8dc7;
+            --p-soft: #fdf2f8;
+            --s: #7b1fa2;
             --bg: #f8f9fa;
             --gray: #8e8e93;
             --text-dark: #1c1c1e;
+            --text-muted: #6c6c70;
             --border-light: #f0f0f2;
             --card-white: #ffffff;
+            --shadow-sm: 0 8px 20px rgba(0, 0, 0, 0.02), 0 2px 6px rgba(0, 0, 0, 0.03);
+            --shadow-md: 0 12px 30px rgba(0, 0, 0, 0.05);
         }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-dark);
+            line-height: 1.5;
+        }
+        /* ========= НОВЫЙ NAVBAR с иконками ========= */
         .navbar {
-            background: rgba(255,255,255,0.82);
+            background: rgba(255, 255, 255, 0.82);
             backdrop-filter: blur(16px);
             padding: 10px 8%;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            flex-wrap: wrap;
             gap: 20px;
             position: sticky;
             top: 0;
             z-index: 1000;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+            flex-wrap: wrap;
         }
-        .logo { font-size: 26px; font-weight: 800; background: linear-gradient(135deg, var(--p), #7b1fa2); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
-        .search-wrapper { flex: 1; max-width: 480px; }
-        .search-form { display: flex; background: rgba(0,0,0,0.03); border-radius: 40px; padding: 6px 16px; border: 1px solid rgba(0,0,0,0.04); }
-        .search-form input { flex: 1; background: transparent; border: none; padding: 10px 0; outline: none; }
-        .search-form button { background: none; border: none; cursor: pointer; }
-        .nav-icons { display: flex; gap: 18px; }
-        .nav-icon { text-decoration: none; color: var(--text-dark); display: flex; flex-direction: column; align-items: center; font-size: 13px; gap: 4px; }
-        .nav-icon i { font-size: 22px; }
+        .logo {
+            font-size: 26px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--p), var(--s));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+            letter-spacing: -0.3px;
+            white-space: nowrap;
+        }
+        .logo span {
+            background: none;
+            -webkit-text-fill-color: var(--p);
+        }
+        /* Search bar */
+        .search-wrapper {
+            flex: 1;
+            max-width: 480px;
+            min-width: 180px;
+        }
+        .search-form {
+            display: flex;
+            align-items: center;
+            background: rgba(0,0,0,0.03);
+            border-radius: 40px;
+            padding: 6px 16px;
+            border: 1px solid rgba(0,0,0,0.04);
+            transition: 0.2s;
+        }
+        .search-form:focus-within {
+            background: white;
+            border-color: var(--p-light);
+            box-shadow: 0 0 0 2px rgba(209,0,122,0.1);
+        }
+        .search-form input {
+            background: transparent;
+            border: none;
+            padding: 10px 0;
+            font-size: 15px;
+            width: 100%;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+        }
+        .search-form button {
+            background: transparent;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+            font-size: 18px;
+            padding: 0 4px;
+            transition: color 0.2s;
+        }
+        .search-form button:hover {
+            color: var(--p);
+        }
+        /* Nav icons */
+        .nav-icons {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+        .nav-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-dark);
+            font-size: 13px;
+            font-weight: 500;
+            transition: color 0.2s;
+            gap: 4px;
+        }
+        .nav-icon i {
+            font-size: 22px;
+        }
+        .nav-icon span {
+            font-size: 12px;
+        }
+        .nav-icon:hover {
+            color: var(--p);
+        }
         .container { max-width: 1280px; margin: 32px auto; padding: 0 24px; }
         .breadcrumbs { margin-bottom: 28px; font-size: 14px; color: var(--gray); }
         .page-header { display: flex; justify-content: space-between; margin-bottom: 32px; }
@@ -80,17 +173,33 @@
 
 <nav class="navbar">
     <a href="/ads" class="logo">Oldi<span>-Berdi</span></a>
+
     <div class="search-wrapper">
         <form class="search-form" action="/ads/search" method="get">
-            <input type="text" name="q" placeholder="Qidiruv...">
+            <input type="text" name="q" placeholder="Qidiruv..." aria-label="Search">
             <button type="submit"><i class="bi bi-search"></i></button>
         </form>
     </div>
+
     <div class="nav-icons">
-        <a href="/ads/create" class="nav-icon"><i class="bi bi-plus-circle"></i><span>Sotish</span></a>
-        <a href="/favorites" class="nav-icon"><i class="bi bi-heart"></i><span>Sevimlilar</span></a>
-        <div sec:authorize="isAnonymous()"><a href="/login" class="nav-icon"><i class="bi bi-person"></i><span>Kirish</span></a></div>
-        <div th:href="@{/profile}" sec:authorize="isAuthenticated()"><a href="/profile" class="nav-icon"><i class="bi bi-person-circle"></i><span>Profil</span></a></div>
+        <!-- Sotish tugmasi -->
+        <a href="/ads/create" class="nav-icon">
+            <i class="bi bi-plus-circle"></i>
+            <span>Sotish</span>
+        </a>
+        <a href="/favorites" class="nav-icon">
+            <i class="bi bi-heart"></i>
+            <span>Sevimlilar</span>
+        </a>
+        <!-- Anonim foydalanuvchi Kirish, autentifikatsiya qilingan Profil -->
+        <a href="/login" class="nav-icon" th:if="${#authorization.expression('isAnonymous()')}">
+            <i class="bi bi-person"></i>
+            <span>Kirish</span>
+        </a>
+        <a href="/profile" class="nav-icon" th:unless="${#authorization.expression('isAnonymous()')}">
+            <i class="bi bi-person-circle"></i>
+            <span>Profil</span>
+        </a>
     </div>
 </nav>
 

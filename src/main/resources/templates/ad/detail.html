@@ -132,23 +132,7 @@
         .nav-icon:hover {
             color: var(--p);
         }
-        @media (max-width: 680px) {
-            .navbar {
-                padding: 10px 16px;
-            }
-            .nav-icon span {
-                display: none;
-            }
-            .nav-icon i {
-                font-size: 24px;
-            }
-            .search-wrapper {
-                order: 3;
-                width: 100%;
-                max-width: 100%;
-                margin-top: 6px;
-            }
-        }
+
 
         /* ===== Остальные стили (галерея, карточка и т.д.) полностью сохранены ===== */
         .container {
@@ -409,32 +393,11 @@
             font-size: 40px;
             opacity: 0.5;
         }
-        @media (max-width: 880px) {
-            .detail-grid {
-                grid-template-columns: 1fr;
-                gap: 32px;
-            }
-            .info-panel {
-                position: static;
-            }
-            .detail-card {
-                padding: 24px;
-            }
-        }
-        @media (max-width: 560px) {
-            .thumb-modern {
-                width: 68px;
-                height: 68px;
-            }
-            .ad-title-modern {
-                font-size: 24px;
-            }
-        }
+
     </style>
 </head>
 <body>
 
-<!-- ========= НОВЫЙ NAVBAR С ИКОНКАМИ, ПОИСКОМ ========= -->
 <nav class="navbar">
     <a href="/ads" class="logo">Oldi<span>-Berdi</span></a>
 
@@ -446,11 +409,16 @@
     </div>
 
     <div class="nav-icons">
+        <!-- Sotish tugmasi -->
+        <a href="/ads/create" class="nav-icon">
+            <i class="bi bi-plus-circle"></i>
+            <span>Sotish</span>
+        </a>
         <a href="/favorites" class="nav-icon">
             <i class="bi bi-heart"></i>
             <span>Sevimlilar</span>
         </a>
-        <!-- Анонимный пользователь видит "Kirish", авторизованный можно заменить на профиль -->
+        <!-- Anonim foydalanuvchi Kirish, autentifikatsiya qilingan Profil -->
         <a href="/login" class="nav-icon" th:if="${#authorization.expression('isAnonymous()')}">
             <i class="bi bi-person"></i>
             <span>Kirish</span>

@@ -7,6 +7,7 @@ import uz.sad.oldi_berdi.entity.dto.ContactSettingsDto;
 import uz.sad.oldi_berdi.entity.dto.UserDto;
 import uz.sad.oldi_berdi.entity.dto.UserRegisterDto;
 import uz.sad.oldi_berdi.entity.enums.Role;
+import uz.sad.oldi_berdi.exception.BadRequestException;
 import uz.sad.oldi_berdi.exception.CustomException;
 import uz.sad.oldi_berdi.mapper.UserMapper;
 import uz.sad.oldi_berdi.repository.UserRepository;
@@ -69,11 +70,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void updatePassword(String oldPassword, String newPassword, String userPhone) {
-        User user = userValidator.checkByLogin(userPhone);
-        if (user.getPassword().equals(encoder.encode(oldPassword))){
-            user.setPassword(encoder.encode(newPassword));
-        }else {
-
-        }
+        User user = userValidator.validateNewPassword(oldPassword, newPassword, userPhone);
+        user.setPassword(encoder.encode(newPassword));
+        userRepository.save(user);
     }
 }
