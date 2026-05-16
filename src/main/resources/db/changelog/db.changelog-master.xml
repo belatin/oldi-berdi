@@ -18,4 +18,5 @@
     <include file="db/changelog/v1/012-delete-constrint-notnull-username-with-users.sql"/>
     <include file="db/changelog/v1/014-create-favorites-table.sql"/>
     <include file="db/changelog/v1/015-add-columns-users-table.sql"/>
+    <include file="db/changelog/v1/016-add-userstatus-column-users-table.sql"/>
 </databaseChangeLog>

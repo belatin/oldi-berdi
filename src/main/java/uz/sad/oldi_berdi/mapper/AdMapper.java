@@ -48,6 +48,7 @@ public class AdMapper {
                 .id(ad.getId())
                 .title(ad.getTitle())
                 .price(ad.getPrice())
+                .username(ad.getUser().getUsername())
                 .categoryName(ad.getCategory().getName())
                 .locationName(ad.getLocation().getName())
                 .createdAt(ad.getCreatedAt()

@@ -11,6 +11,7 @@ public class UserDto {
     private Long id;
     private String username;
     private String phone;
+    private String status;
     private String created_at;
     private String updated_at;
 }

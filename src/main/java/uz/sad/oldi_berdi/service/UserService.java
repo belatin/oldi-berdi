@@ -5,6 +5,8 @@ import uz.sad.oldi_berdi.entity.dto.ContactSettingsDto;
 import uz.sad.oldi_berdi.entity.dto.UserDto;
 import uz.sad.oldi_berdi.entity.dto.UserRegisterDto;
 
+import java.util.List;
+
 public interface UserService {
     void register(UserRegisterDto dto);
     UserDto getUser(String login);
@@ -17,4 +19,15 @@ public interface UserService {
 
     void updatePassword(String oldPassword, String newPassword, String login);
 
+    List<UserDto> getAll();
+
+    UserDto getById(Long id);
+
+    void blockUser(Long id);
+
+    void unBlockUser(Long id);
+
+    long countUsers();
+
+    long countOfBlockedUsers();
 }

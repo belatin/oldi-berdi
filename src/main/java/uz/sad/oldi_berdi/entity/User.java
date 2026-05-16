@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uz.sad.oldi_berdi.entity.base.BaseEntity;
 import uz.sad.oldi_berdi.entity.enums.Role;
+import uz.sad.oldi_berdi.entity.enums.UserStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,10 @@ public class User extends BaseEntity {
     @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private UserStatus status = UserStatus.ACTIVE;
 
     @Column(name = "allow_phone_call", nullable = false)
     private boolean allowPhoneCall = true;

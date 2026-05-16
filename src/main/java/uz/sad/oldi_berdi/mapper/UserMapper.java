@@ -18,6 +18,7 @@ public class UserMapper {
                 .id(user.getId())
                 .username(user.getUsername())
                 .phone(user.getPhone())
+                .status(user.getStatus().name())
                 .created_at(user.getCreatedAt()
                         .format(DateTimeFormatter.ofPattern("dd:MM:yyyy HH:mm")))
                 .updated_at(user.getUpdatedAt()

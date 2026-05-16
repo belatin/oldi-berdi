@@ -23,6 +23,7 @@ public class UserValidator {
                 .orElseThrow(() -> new CustomException("User by login = " + login + " not found"));
     }
 
+
     public User checkById(Long id) {
         return userRepository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new CustomException("User by id = " + id + " not found"));

@@ -7,16 +7,27 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
+    @Bean
+    public AuthenticationSuccessHandler successHandler() {
+        return (request, response, authentication) -> {
+            boolean isAdmin = authentication.getAuthorities().stream()
+                    .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+            String targetUrl = isAdmin ? "/admin" : "/ads";
+            response.sendRedirect(targetUrl);
+        };
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/css/**", "/js/**", "/img/**", "/uploads/**").permitAll()
                         .requestMatchers("/ads/**", "/auth/**", "/favorites/**", "/api/**").permitAll()
                         .anyRequest().authenticated()
@@ -26,7 +37,7 @@ public class SecurityConfig {
                         .loginProcessingUrl("/auth/login")
                         .usernameParameter("phone")
                         .passwordParameter("password")
-                        .defaultSuccessUrl("/ads", true)
+                        .successHandler(successHandler())
                         .failureUrl("/auth/login?error=true")
                         .permitAll()
                 )

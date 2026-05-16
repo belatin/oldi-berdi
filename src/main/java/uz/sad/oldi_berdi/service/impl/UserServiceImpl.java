@@ -7,6 +7,7 @@ import uz.sad.oldi_berdi.entity.dto.ContactSettingsDto;
 import uz.sad.oldi_berdi.entity.dto.UserDto;
 import uz.sad.oldi_berdi.entity.dto.UserRegisterDto;
 import uz.sad.oldi_berdi.entity.enums.Role;
+import uz.sad.oldi_berdi.entity.enums.UserStatus;
 import uz.sad.oldi_berdi.exception.BadRequestException;
 import uz.sad.oldi_berdi.exception.CustomException;
 import uz.sad.oldi_berdi.mapper.UserMapper;
@@ -14,6 +15,8 @@ import uz.sad.oldi_berdi.repository.UserRepository;
 import uz.sad.oldi_berdi.service.UserService;
 import uz.sad.oldi_berdi.validator.LoginValidator;
 import uz.sad.oldi_berdi.validator.UserValidator;
+
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -39,6 +42,7 @@ public class UserServiceImpl implements UserService {
         User user = new User();
         user.setPhone(dto.getPhone().replace(" ", ""));
         user.setPassword(encoder.encode(dto.getPassword()));
+        user.setStatus(UserStatus.ACTIVE);
         user.setRole(Role.USER);
         userRepository.save(user);
     }
@@ -73,5 +77,45 @@ public class UserServiceImpl implements UserService {
         User user = userValidator.validateNewPassword(oldPassword, newPassword, userPhone);
         user.setPassword(encoder.encode(newPassword));
         userRepository.save(user);
+    }
+
+    @Override
+    public List<UserDto> getAll() {
+        List<User> users = userRepository.findAll();
+        return users.stream().map(userMapper::toDto).toList();
+    }
+
+    @Override
+    public UserDto getById(Long id){
+        User user = userValidator.checkById(id);
+        return userMapper.toDto(user);
+    }
+
+    @Override
+    public void blockUser(Long id) {
+        User user = userValidator.checkById(id);
+        if (user.getStatus() == UserStatus.ACTIVE){
+            user.setStatus(UserStatus.BLOCKED);
+            userRepository.save(user);
+        }
+    }
+
+    @Override
+    public void unBlockUser(Long id) {
+        User user = userValidator.checkById(id);
+        if (user.getStatus() == UserStatus.BLOCKED){
+            user.setStatus(UserStatus.ACTIVE);
+            userRepository.save(user);
+        }
+    }
+
+    @Override
+    public long countUsers() {
+        return userRepository.countByDeletedFalse();
+    }
+
+    @Override
+    public long countOfBlockedUsers() {
+        return userRepository.countByStatusAndDeletedFalse(UserStatus.BLOCKED);
     }
 }

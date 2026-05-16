@@ -13,4 +13,7 @@ public interface AdService {
     AdDetailDto getById(Long l);
     void create(AdCreateDto dto, String login);
     List<AdListDto> findAllByIds(List<Long> ids);
+    long countAds();
+    Page<AdListDto> getAllAdsForAdmin(Pageable pageable);
+    void deleteAdById(Long id);
 }

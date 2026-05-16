@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import uz.sad.oldi_berdi.entity.dto.ErrorDto;
 
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+public class GlobalExceptionHandlerRest {
 
     @ExceptionHandler({BadRequestException.class})
     public ResponseEntity<ErrorDto> handlerException(BadRequestException e){

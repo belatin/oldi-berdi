@@ -15,4 +15,5 @@ public interface AdRepository extends JpaRepository<Ad, Long> {
     Page<Ad> findAllByDeletedFalse(Pageable pageable);
     Optional<Ad> findByIdAndDeletedFalse(Long id);
 
+    long countByDeletedFalse();
 }

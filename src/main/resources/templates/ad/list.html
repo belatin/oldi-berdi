@@ -192,14 +192,18 @@
             <span>Sevimlilar</span>
         </a>
         <!-- Anonim foydalanuvchi Kirish, autentifikatsiya qilingan Profil -->
-        <a href="/login" class="nav-icon" th:if="${#authorization.expression('isAnonymous()')}">
-            <i class="bi bi-person"></i>
-            <span>Kirish</span>
-        </a>
-        <a href="/profile" class="nav-icon" th:unless="${#authorization.expression('isAnonymous()')}">
-            <i class="bi bi-person-circle"></i>
-            <span>Profil</span>
-        </a>
+        <div sec:authorize="isAnonymous()">
+            <a href="/login" class="nav-icon">
+                <i class="bi bi-person"></i>
+                <span>Kirish</span>
+            </a>
+        </div>
+        <div sec:authorize="isAuthenticated()">
+            <a href="/profile" class="nav-icon">
+                <i class="bi bi-person-circle"></i>
+                <span>Profil</span>
+            </a>
+        </div>
     </div>
 </nav>
 

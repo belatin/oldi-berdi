@@ -104,4 +104,22 @@ public class AdServiceImpl implements AdService {
                 .map(adMapper::toListDto)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public long countAds() {
+        return adRepository.countByDeletedFalse();
+    }
+
+    @Override
+    public Page<AdListDto> getAllAdsForAdmin(Pageable pageable) {
+        Page<Ad> ads = adRepository.findAllByDeletedFalse(pageable);
+        return ads.map(adMapper::toListDto);
+    }
+
+    @Override
+    public void deleteAdById(Long id) {
+        Ad ad = adValidator.checkById(id);
+        ad.setDeleted(true);
+        adRepository.save(ad);
+    }
 }

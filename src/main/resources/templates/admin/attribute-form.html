@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Atribut formasi | Admin</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root { --p: #d1007a; --bg: #f8f9fa; --border-light: #f0f0f2; --card-white: #ffffff; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); }
+    .navbar { background: rgba(255,255,255,0.82); backdrop-filter: blur(16px); padding: 10px 8%; display: flex; align-items: center; justify-content: space-between; }
+    .logo { font-size: 26px; font-weight: 800; background: linear-gradient(135deg, var(--p), #7b1fa2); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+    .container { max-width: 800px; margin: 32px auto; padding: 0 24px; }
+    .card { background: var(--card-white); border-radius: 28px; border: 1px solid var(--border-light); padding: 32px; }
+    .form-group { margin-bottom: 24px; }
+    label { font-weight: 600; display: block; margin-bottom: 8px; }
+    input, select { width: 100%; padding: 12px; border-radius: 20px; border: 1px solid var(--border-light); background: #fbfbfd; font-size: 14px; }
+    .checkbox-group { display: flex; gap: 10px; align-items: center; }
+    .options-group { margin-top: 20px; padding: 16px; background: var(--bg); border-radius: 20px; }
+    .option-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
+    .btn { padding: 12px 24px; border-radius: 40px; border: none; cursor: pointer; background: var(--p); color: white; font-weight: 600; }
+    .btn-secondary { background: #ccc; color: black; }
+    .btn-sm { background: transparent; border: 1px solid var(--border-light); padding: 6px 12px; border-radius: 30px; cursor: pointer; }
+  </style>
+</head>
+<body>
+<nav class="navbar">
+  <a href="/admin" class="logo">Oldi-Berdi Admin</a>
+  <a href="/admin/category-attributes" class="btn-sm" style="text-decoration: none;">⬅ Orqaga</a>
+</nav>
+<div class="container">
+  <div class="card">
+    <h2 th:if="${attribute.id == null}">➕ Yangi atribut</h2>
+    <h2 th:if="${attribute.id != null}">✏️ Atributni tahrirlash</h2>
+
+    <form th:action="${attribute.id == null ? '/admin/category-attributes/create' : '/admin/category-attributes/edit/' + attribute.id}" method="post">
+      <input type="hidden" name="categoryId" th:value="${param.categoryId != null ? param.categoryId : attribute.categoryId}">
+      <div class="form-group">
+        <label>Atribut nomi</label>
+        <input type="text" name="name" th:value="${attribute.name}" required>
+      </div>
+      <div class="form-group">
+        <label>Atribut turi</label>
+        <select name="attributeType" id="attributeType" required>
+          <option value="TEXT" th:selected="${attribute.attributeType == 'TEXT'}">Matn (TEXT)</option>
+          <option value="NUMBER" th:selected="${attribute.attributeType == 'NUMBER'}">Raqam (NUMBER)</option>
+          <option value="SELECT" th:selected="${attribute.attributeType == 'SELECT'}">Tanlov (SELECT)</option>
+        </select>
+      </div>
+      <div class="form-group checkbox-group">
+        <input type="checkbox" id="required" name="required" th:checked="${attribute.required}">
+        <label for="required" style="display: inline;">Majburiy</label>
+      </div>
+
+      <div id="optionsBlock" class="options-group" style="display: none;">
+        <label>Variantlar (har bir qatorga bitta variant)</label>
+        <div id="optionsContainer">
+          <div th:each="opt, iterStat : ${attribute.options}" class="option-row">
+            <input type="text" name="options" th:value="${opt}" style="flex:1;" placeholder="Variant qiymati">
+            <button type="button" class="btn-sm" onclick="removeOption(this)">✖</button>
+          </div>
+        </div>
+        <button type="button" class="btn-sm" onclick="addOption()">+ Variant qo‘shish</button>
+      </div>
+
+      <div style="margin-top: 32px; display: flex; gap: 12px;">
+        <button type="submit" class="btn">Saqlash</button>
+        <a href="/admin/category-attributes" class="btn btn-secondary" style="text-decoration: none; text-align: center;">Bekor qilish</a>
+      </div>
+    </form>
+  </div>
+</div>
+<script>
+  const typeSelect = document.getElementById('attributeType');
+  const optionsBlock = document.getElementById('optionsBlock');
+  function toggleOptions() { optionsBlock.style.display = typeSelect.value === 'SELECT' ? 'block' : 'none'; }
+  typeSelect.addEventListener('change', toggleOptions);
+  toggleOptions();
+
+  function addOption() {
+    const container = document.getElementById('optionsContainer');
+    const div = document.createElement('div');
+    div.className = 'option-row';
+    div.innerHTML = `<input type="text" name="options" style="flex:1;" placeholder="Variant qiymati"><button type="button" class="btn-sm" onclick="removeOption(this)">✖</button>`;
+    container.appendChild(div);
+  }
+  function removeOption(btn) { btn.parentElement.remove(); }
+  // Agar hech bo'lmaganda bitta variant bo'lmasa, default bitta qator qo'shamiz
+  if (document.querySelectorAll('#optionsContainer .option-row').length === 0 && typeSelect.value === 'SELECT') {
+    addOption();
+  }
+</script>
+</body>
+</html>
